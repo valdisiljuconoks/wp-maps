@@ -29,14 +29,17 @@ namespace JeffWilcox.Controls
     /// A simple static maps control for Windows Phone.
     /// </summary>
     [TemplatePart(Name = ImagePartName, Type = typeof(Image))]
+    [TemplatePart(Name = PushpinImagePartName, Type = typeof(Image))]
     public class StaticMap : Control
     {
         private const string ImagePartName = "_image";
+        private const string PushpinImagePartName = "_pushpin";
 
         private double _width;
         private double _height;
         private StaticMapProvider _mapProvider;
         private Image _image;
+        private Image _pushpin;
 
         #region public GeoCoordinate MapCenter
         /// <summary>
@@ -70,6 +73,27 @@ namespace JeffWilcox.Controls
         }
         #endregion public GeoCoordinate MapCenter
 
+        #region public Visibility IsDefaultPushpinVisible
+        public Visibility IsDefaultPushpinVisible
+        {
+            get
+            {
+                return (Visibility)GetValue(IsDefaultPushpinVisibleProperty);
+            }
+            set
+            {
+                SetValue(IsDefaultPushpinVisibleProperty, value);
+            }
+        }
+
+        public static readonly DependencyProperty IsDefaultPushpinVisibleProperty =
+            DependencyProperty.Register(
+                "IsDefaultPushpinVisible",
+                typeof(Visibility),
+                typeof(StaticMap),
+                new PropertyMetadata(Visibility.Visible));
+        #endregion public Visibility IsDefaultPushpinVisible
+        
         #region public int ZoomLevel
         /// <summary>
         /// Gets or sets the zoom level, a value from 1 to 22, where 1 will
@@ -103,6 +127,29 @@ namespace JeffWilcox.Controls
             source.UpdateMap();
         }
         #endregion public int ZoomLevel
+
+        #region public string MapCenterImage
+        /// <summary>
+        /// Gets or sets the zoom level, a value from 1 to 22, where 1 will
+        /// show the entire world, and 22 will show at the street level
+        /// approximately. Default value is 15.
+        /// </summary>
+        public Image MapCenterImage
+        {
+            get { return (Image)GetValue(MapCenterImageProperty); }
+            set { SetValue(MapCenterImageProperty, value); }
+        }
+
+        /// <summary>
+        /// Identifies the ZoomLevel dependency property.
+        /// </summary>
+        public static readonly DependencyProperty MapCenterImageProperty =
+            DependencyProperty.Register(
+                "MapCenterImage",
+                typeof(Image),
+                typeof(StaticMap),
+                new PropertyMetadata(null));
+        #endregion public string MapCenterImage
 
         #region public StaticMapProviderType Provider
         /// <summary>
@@ -271,6 +318,7 @@ namespace JeffWilcox.Controls
             base.OnApplyTemplate();
 
             _image = GetTemplateChild(ImagePartName) as Image;
+            _pushpin = GetTemplateChild(PushpinImagePartName) as Image;
 
             UpdateMap();
         }
@@ -345,6 +393,12 @@ namespace JeffWilcox.Controls
 
                 ActualImageSource = _mapProvider.GetStaticMap();
                 _image.Source = new BitmapImage(ActualImageSource);
+
+                if (MapCenterImage != null)
+                {
+                    _pushpin.Source = MapCenterImage.Source;
+                    IsDefaultPushpinVisible = Visibility.Collapsed;
+                }
             }
         }
     }

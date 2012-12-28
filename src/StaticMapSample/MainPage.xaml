@@ -54,6 +54,7 @@
                     x:Name="_bingMap"
                     Margin="-12,0,-12,0"
                     Provider="Bing"
+                    MapCenterImage="{StaticResource samplePushpinImage}"
                     Height="200">
                     <jwMaps:StaticMap.MapCenter>
                         <geo:GeoCoordinate
